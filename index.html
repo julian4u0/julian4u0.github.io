@@ -1,102 +1,224 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/5.1.3/pixi.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/5.1.3/pixi.min.js"></script>
 </head>
+
 <body>
-    <script type="text/javascript">
+  <script type="text/javascript">
     let width = 600
     let height = 600
-      let type = "WebGL"
-      if(!PIXI.utils.isWebGLSupported()){
-        type = "canvas"
-      }
-      let app = new PIXI.Application({ 
-    width: width, 
-    height: height,                       
-    antialias: true, 
-    transparent: false, 
-    resolution: 1
-  }
-);
-
-//Add the canvas that Pixi automatically created for you to the HTML document
-document.body.appendChild(app.view);
-
-//load an image and run the `setup` function when it's done
-PIXI.loader
-  .add("texture/kid.svg")
-  .add("texture/grass.png")
-  .add("texture/arriba.png")
-  .add("texture/abajo.png")
-  .add("texture/izquierda.png")
-  .add("texture/derecha.png")
-  .load(setup);
-  let dungeon = PIXI.Sprite.from("texture/grass.png");
-  let arriba = PIXI.Texture.from('texture/arriba.png');
-  let abajo = PIXI.Texture.from('texture/abajo.png');
-  let izquierda = PIXI.Texture.from('texture/izquierda.png');
-  let derecha = PIXI.Texture.from('texture/derecha.png');
-  let sprite = new PIXI.Sprite(abajo);
-//This `setup` function will run when the image has loaded
-  function generateBackground() {
-    for (let w = 0; w < width/100; w++) {
-      for (let h = 0; h < height/100; h++) {
-        var dun = PIXI.Sprite.from("texture/grass.png");
-        dun.width = 100;
-        dun.height = 100;
-        dun.position.set(w*100, h*100)
-        app.stage.addChild(dun);
-
-        
-      }
-      
+    let type = "WebGL"
+    if (!PIXI.utils.isWebGLSupported()) {
+      type = "canvas"
     }
-  }
-  generateBackground()
-  function setup() {
-    sprite.position.set(20, 20)
-    sprite.width = sprite.width*2;
-    sprite.height = sprite.height*2 ;
-    dungeon.width = 100;
-    dungeon.height = 100;
-    app.stage.addChild(dungeon);
-    app.stage.addChild(sprite);
-  }
-    document.addEventListener('keydown', function(event){
-      //alert(event.keyCode);
+    let app = new PIXI.Application({
+      width: width,
+      height: height,
+      antialias: true,
+      transparent: false,
+      resolution: 1
+    });
+
+    //Add the canvas that Pixi automatically created for you to the HTML document
+    document.body.appendChild(app.view);
+
+    //load an image and run the `setup` function when it's done
+    PIXI.loader
+      .add("texture/kid.svg")
+      .add("texture/grass.png")
+      .add("texture/arriba.png")
+      .add("texture/abajo.png")
+      .add("texture/izquierda.png")
+      .add("texture/derecha.png")
+      .add("texture/arbol.png")
+      .load(setup);
+    let dungeon = PIXI.Sprite.from("texture/grass.png");
+    let arriba = PIXI.Texture.from('texture/arriba.png');
+    let abajo = PIXI.Texture.from('texture/abajo.png');
+    let izquierda = PIXI.Texture.from('texture/izquierda.png');
+    let derecha = PIXI.Texture.from('texture/derecha.png');
+    let arbol = PIXI.Texture.from('texture/arbol.png');
+    let sprite = new PIXI.Sprite(abajo);
+    var inix = 0;
+    var iniy = 0;
+    var cenx = width / 2;
+    var ceny = height / 2;
+    var keys = {
+      a: false,
+      w: false,
+      s: false,
+      d: false
+    };
+    let fondo = new PIXI.Container();
+    let arboles = new PIXI.Container();
+    for (let i = 0; i < 100; i++) {
+      var arb = PIXI.Sprite.from('texture/arbol.png');
+
+      var randx =Math.floor((Math.random())*1200)
+      var randy = Math.floor((Math.random())*1200)
+      if (i%2 == 0) {
+        randx = -randx
+        randy = -randy
+      }
+      arb.position.set(randx, randy)
+      arboles.addChild(arb);
+    }
+    //This `setup` function will run when the image has loaded
+    function generateBackground(x, y) {
+      fondo.removeChildren()
+      for (let w = -10; w < 10; w++) {
+        for (let h = -10; h < 10; h++) {
+          var dun = PIXI.Sprite.from("texture/grass.png");
+          dun.width = 100;
+          dun.height = 100;
+          dun.position.set(cenx + w * 100 + x, ceny + h * 100 + y)
+          //app.stage.addChild(dun);
+          fondo.addChild(dun);
+
+
+        }
+
+      }
+          arboles.x = x
+          arboles.y =  y
+      app.stage.addChild(fondo)
+      app.stage.addChild(arboles)
+      app.stage.addChild(sprite);
+
+
+    }
+
+    function matrix(m, n) {
+      var result = []
+      for (var i = 0; i < n; i++) {
+        result.push(new Array(m).fill(0))
+      }
+      return result
+    }
+    map = matrix(20, 20)
+    generateBackground(0, 0)
+
+    function setup() {
+      sprite.position.set(width / 2, height / 2)
+      sprite.width = sprite.width * 2;
+      sprite.height = sprite.height * 2;
+      app.stage.addChild(sprite);
+    }
+/*
+    function xff() {
+
+      if (sprite.x > cenx + width / 3) {
+        cenx = cenx - 5
+      } else if (sprite.x < cenx - width / 3) {
+        cenx = cenx + 5
+
+      } else if (sprite.y < ceny - height / 3) {
+        ceny = ceny + 5
+
+      } else if (sprite.y > ceny + height / 3) {
+
+        ceny = ceny - 5
+      }
+
+    }
+*/
+    function camina() {
+      if (keys["a"]) {
+        if (sprite.x > cenx - width /3) {
+        sprite.x = sprite.x - 5;
+        }
+        else{
+          inix  = inix + 5;
+          generateBackground(inix, iniy);
+        }
+        sprite.texture = izquierda;
+      }
+      if (keys["d"]) {
+        if (sprite.x < cenx + width /3) {
+        sprite.x = sprite.x + 5;
+        }
+        else{
+          inix  = inix - 5;
+          generateBackground(inix, iniy);
+        }
+        sprite.texture = derecha;
+      }
+      //
+      if (keys["w"]) {
+        if (sprite.y > ceny - height /3) {
+        sprite.y = sprite.y - 5;
+        }
+        else{
+          iniy  = iniy + 5;
+          generateBackground(inix, iniy);
+        }
+        sprite.texture = arriba;
+      }
+      if (keys["s"]) {
+        if (sprite.y < ceny + (height /3)) {
+        sprite.y = sprite.y +5;
+        }
+        else{
+          iniy  = iniy - 5;
+          generateBackground(inix, iniy);
+        }
+        sprite.texture = abajo;
+      }
+
+    }
+    document.addEventListener('keydown', function (event) {
       switch (event.keyCode) {
-        
         case 65:
-          sprite.x = sprite.x -5
-          sprite.texture = izquierda;
+          keys["a"] = true
+          //inix = inix - 5;
           break;
         case 68:
-          
-        sprite.x = sprite.x +5
-          sprite.texture = derecha;
+          keys["d"] = true
+          //inix = inix + 5;
           break;
         case 87:
-        sprite.y = sprite.y -5
-          sprite.texture = arriba;
-          
+          keys["w"] = true
+          //iniy = iniy - 5;
           break;
         case 83:
-        sprite.y = sprite.y +5
-          sprite.texture = abajo;
-          
-          break;
-      
-        default:
+          keys["s"] = true
+          //iniy = iniy + 5;
           break;
       }
-  } );
-  //app.stage.removeChild(sprite)
-    </script>
-    
+      
+      camina()
+
+
+
+    });
+
+    document.addEventListener('keyup', function (event) {
+      switch (event.keyCode) {
+        case 65:
+          keys["a"] = false
+          break;
+        case 68:
+          keys["d"] = false
+          break;
+        case 87:
+          keys["w"] = false
+          break;
+        case 83:
+          keys["s"] = false
+          break;
+      }
+
+    });
+
+    // app.stage.removeChild(sprite)
+  </script>
+
 </body>
+
 </html>
