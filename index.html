@@ -30,13 +30,7 @@
 
     //load an image and run the `setup` function when it's done
     PIXI.loader
-      .add("texture/kid.svg")
-      .add("texture/grass.png")
-      .add("texture/arriba.png")
-      .add("texture/abajo.png")
-      .add("texture/izquierda.png")
-      .add("texture/derecha.png")
-      .add("texture/arbol.png")
+      .add("texture/abajo2.png")
       .load(setup);
     let dungeon = PIXI.Sprite.from("texture/grass.png");
     let arriba = PIXI.Texture.from('texture/arriba.png');
@@ -44,7 +38,39 @@
     let izquierda = PIXI.Texture.from('texture/izquierda.png');
     let derecha = PIXI.Texture.from('texture/derecha.png');
     let arbol = PIXI.Texture.from('texture/arbol.png');
+    let abajoImages = ["texture/abajo.png", "texture/abajo1.png", "texture/abajo.png", "texture/abajo2.png"];
+    let arribaImages = ["texture/arriba.png", "texture/arriba1.png", "texture/arriba.png", "texture/arriba2.png"];
+    let izquierdaImages = ["texture/izquierda.png", "texture/izquierda1.png", "texture/izquierda.png",
+      "texture/izquierda2.png"
+    ];
+    let derechaImages = ["texture/derecha.png", "texture/derecha1.png", "texture/derecha.png", "texture/derecha2.png"];
+    let golpearImages = ["texture/golpear1.png", "texture/golpear2.png", "texture/golpear3.png",
+      "texture/golpear3.png"
+    ];
+
+    let abajotexarray = [];
+    let arribatexarray = [];
+    let izquierdatexarray = [];
+    let derechatexarray = [];
+    let golpeartexarray = [];
+
+    for (let i = 0; i <= 3; i++) {
+      let abajotexture = PIXI.Texture.from(abajoImages[i]);
+      abajotexarray.push(abajotexture);
+      let arribatexture = PIXI.Texture.from(arribaImages[i]);
+      arribatexarray.push(arribatexture);
+      let izquierdatexture = PIXI.Texture.from(izquierdaImages[i]);
+      izquierdatexarray.push(izquierdatexture);
+      let derechatexture = PIXI.Texture.from(derechaImages[i]);
+      derechatexarray.push(derechatexture);
+      let golpeartexture = PIXI.Texture.from(golpearImages[i]);
+      golpeartexarray.push(golpeartexture);
+    };
+
+
+
     let sprite = new PIXI.Sprite(abajo);
+    var collisiona = false
     var inix = 0;
     var iniy = 0;
     var cenx = width / 2;
@@ -53,18 +79,20 @@
       a: false,
       w: false,
       s: false,
-      d: false
+      d: false,
+      esp: false
     };
+    var animId = 0;
     let fondo = new PIXI.Container();
     let arboles = new PIXI.Container();
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 20; i++) {
       var arb = PIXI.Sprite.from('texture/arbol.png');
 
-      var randx =Math.floor((Math.random())*1200)
-      var randy = Math.floor((Math.random())*1200)
-      if (i%2 == 0) {
+      var randx =  Math.floor((Math.random()) * 600)
+      var randy = Math.floor((Math.random()) * 600)
+      if (i % 2 == 0) {
         randx = -randx
-        randy = -randy
+        //randy = -randy
       }
       arb.position.set(randx, randy)
       arboles.addChild(arb);
@@ -85,8 +113,8 @@
         }
 
       }
-          arboles.x = x
-          arboles.y =  y
+      arboles.x = x
+      arboles.y = y
       app.stage.addChild(fondo)
       app.stage.addChild(arboles)
       app.stage.addChild(sprite);
@@ -110,67 +138,106 @@
       sprite.height = sprite.height * 2;
       app.stage.addChild(sprite);
     }
-/*
-    function xff() {
 
-      if (sprite.x > cenx + width / 3) {
-        cenx = cenx - 5
-      } else if (sprite.x < cenx - width / 3) {
-        cenx = cenx + 5
+    function golpe() {
 
-      } else if (sprite.y < ceny - height / 3) {
-        ceny = ceny + 5
+      setTimeout(function () {
+        sprite.texture = golpeartexarray[animId];
+        animId++;
+        if (animId != 4) {
+          golpe()
+        } else {
+          sprite.texture = golpeartexarray[0];
+        }
+      }, 150);
+    }
 
-      } else if (sprite.y > ceny + height / 3) {
-
-        ceny = ceny - 5
+    function verColision(x, y) {
+      for (let k = 0; k < arboles.children.length; k++) {
+        if (y < arboles.position.y + arboles.children[k].y + 20 &&
+          y > arboles.position.y + arboles.children[k].y - 20)// &&
+         // x < arboles.position.x + arboles.children[k].x + 20 &&
+          //x > arboles.position.x + arboles.children[k].x - 20) {
+            {
+          //console.log("EE")
+          //return true
+        } else {
+          //console.log("A")
+          //return false
+        }
       }
 
     }
-*/
+
     function camina() {
       if (keys["a"]) {
-        if (sprite.x > cenx - width /3) {
-        sprite.x = sprite.x - 5;
+        if (!verColision(sprite.x - 5, sprite.y)) {
+          if (sprite.x > cenx - width / 3) {
+            sprite.x = sprite.x - 5;
+          } else {
+
+            inix = inix + 5;
+            generateBackground(inix, iniy);
+          }
         }
-        else{
-          inix  = inix + 5;
-          generateBackground(inix, iniy);
+        if (animId == 4) {
+          animId = 0;
         }
-        sprite.texture = izquierda;
+        sprite.texture = izquierdatexarray[animId];
+        animId++;
       }
       if (keys["d"]) {
-        if (sprite.x < cenx + width /3) {
-        sprite.x = sprite.x + 5;
-        }
-        else{
-          inix  = inix - 5;
+          if (!verColision(sprite.x + 5, sprite.y)) {
+        if (sprite.x < cenx + width / 3) {
+            sprite.x = sprite.x + 5;
+        } else {
+          inix = inix - 5;
           generateBackground(inix, iniy);
         }
-        sprite.texture = derecha;
+          }
+        if (animId == 4) {
+          animId = 0;
+        }
+        sprite.texture = derechatexarray[animId];
+        animId++;
       }
       //
       if (keys["w"]) {
-        if (sprite.y > ceny - height /3) {
-        sprite.y = sprite.y - 5;
-        }
-        else{
-          iniy  = iniy + 5;
+          if (!verColision(sprite.x, sprite.y - 5)) {
+        if (sprite.y > ceny - height / 3) {
+            sprite.y = sprite.y - 5;
+
+        } else {
+          iniy = iniy + 5;
           generateBackground(inix, iniy);
         }
-        sprite.texture = arriba;
+          }
+        if (animId == 4) {
+          animId = 0;
+        }
+        sprite.texture = arribatexarray[animId];
+        animId++;
       }
       if (keys["s"]) {
-        if (sprite.y < ceny + (height /3)) {
-        sprite.y = sprite.y +5;
-        }
-        else{
-          iniy  = iniy - 5;
+          if (!verColision(sprite.x, sprite.y + 5)) {
+        if (sprite.y < ceny + (height / 3)) {
+            sprite.y = sprite.y + 5;
+        } else {
+          iniy = iniy - 5;
           generateBackground(inix, iniy);
         }
-        sprite.texture = abajo;
+          }
+        if (animId == 4) {
+          animId = 0;
+        }
+        sprite.texture = abajotexarray[animId];
+        animId++;
+        //sprite.texture = abajo;
       }
-
+      if (keys["esp"]) {
+        animId = 0;
+        golpe();
+      }
     }
     document.addEventListener('keydown', function (event) {
       switch (event.keyCode) {
@@ -190,8 +257,12 @@
           keys["s"] = true
           //iniy = iniy + 5;
           break;
+        case 32:
+          keys["esp"] = true
+          //iniy = iniy + 5;
+          break;
       }
-      
+
       camina()
 
 
@@ -211,6 +282,9 @@
           break;
         case 83:
           keys["s"] = false
+          break;
+        case 32:
+          keys["esp"] = false
           break;
       }
 
