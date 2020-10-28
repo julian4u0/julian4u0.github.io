@@ -1,5 +1,21 @@
 ---
-title: "Welcome to my github page!"
+title: "Personal page"
 author: "Julian Usuga Ortiz"
-output: html_document
+output: 
+   html_document:
+      css: "style.css"
+      includes:
+         after_body: footer.html
 ---
+
+My site is under construction :)
+
+### About me
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+<hr />
+### My Projects
+
+* Lorem ipsum dolor sit amet.
+* Consectetur adipiscing elit.
+* Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
