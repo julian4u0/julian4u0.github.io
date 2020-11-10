@@ -1,5 +1,5 @@
 ---
-title: "World-Happiness"
+title: "World Happiness "
 author: "Julian Usuga Ortiz"
 date: "24/10/2020"
 output: html_document
@@ -7,31 +7,133 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(comment = FALSE)
+library(tidyverse)
+library(gganimate)
+library(gifski)
+library(png)
 ```
 
-```{r, include=FALSE}
-data16 <- read.csv(file = '2016.csv')
-data17 <- read.csv(file = '2017.csv')
-data18 <- read.csv(file = '2018.csv')
-data19 <- read.csv(file = '2019.csv')
-```
 
-
-## World Happiness Report analysis
+This is an descriptive analysis to world happiness scores
 
 See info and data source 
 <https://www.kaggle.com/unsdsn/world-happiness>
 
-```{r}
-summary(data16)
+
+```{r, include=FALSE }
+data15 <- read.csv(file = '2015.csv')
+data15$year = "2015"
+data16 <- read.csv(file = '2016.csv')
+data16$year = "2016"
+data17 <- read.csv(file = '2017.csv')
+data17$year = "2017"
+data18 <- read.csv(file = '2018.csv')
+data18$year = "2018"
+data19 <- read.csv(file = '2019.csv')
+data19$year = "2019"
+
+
+data15 <- data15 %>% select(!Dystopia.Residual & !Standard.Error & !Family &!Region)
+
+data16 <- data16 %>% select(!Dystopia.Residual & !Upper.Confidence.Interval & !Lower.Confidence.Interval & !Family &!Region)
+
+data17 <- data17 %>% select(!Whisker.high & !Whisker.low & !Dystopia.Residual & !Family)
+
+data18 <- data18 %>% select(!Social.support)
+
+data19 <- data19 %>% select(!Social.support)
 ```
+
+
+
+
+
+
+```{r, include=FALSE, message=FALSE}
+
+data15 <- rename(data15,
+                 c('Country.or.region'='Country'), 
+                 c("Overall.rank"="Happiness.Rank"), 
+                 c("GDP.per.capita"="Economy..GDP.per.Capita."), 
+                 c("Freedom.to.make.life.choices"="Freedom"), 
+                 c("Perceptions.of.corruption"="Trust..Government.Corruption."), 
+                 c("Score"="Happiness.Score"), 
+                 c("Healthy.life.expectancy"="Health..Life.Expectancy."))
+data16 <- rename(data16,
+                 c('Country.or.region'='Country'), 
+                 c("Overall.rank"="Happiness.Rank"), 
+                 c("GDP.per.capita"="Economy..GDP.per.Capita."), 
+                 c("Freedom.to.make.life.choices"="Freedom"), 
+                 c("Perceptions.of.corruption"="Trust..Government.Corruption."), 
+                 c("Score"="Happiness.Score"), 
+                 c("Healthy.life.expectancy"="Health..Life.Expectancy."))
+data17 <- rename(data17,
+                 c('Country.or.region'='Country'), 
+                 c("Overall.rank"="Happiness.Rank"), 
+                 c("GDP.per.capita"="Economy..GDP.per.Capita."), 
+                 c("Freedom.to.make.life.choices"="Freedom"), 
+                 c("Perceptions.of.corruption"="Trust..Government.Corruption."), 
+                 c("Score"="Happiness.Score"), 
+                 c("Healthy.life.expectancy"="Health..Life.Expectancy."))
+
+happiness <- rbind(data15, data16, data17, data18, data19)
+
+
+#Remove initial data
+rm(data15, data16, data17, data18, data19)
+```
+
+```{r, message=FALSE}
+happiness$Perceptions.of.corruption <- as.numeric(as.character(happiness$Perceptions.of.corruption) )
+```
+
+
+```{r, message=FALSE}
+happiness %>%
+   filter(Overall.rank < 50) %>%
+   ggplot(aes(x =year, y = Healthy.life.expectancy, color = year)) +
+   geom_violin()+
+   geom_jitter() +
+   ylab("Healthy life Expectancy")
+```
+
 
 ## Including Plots
 
 You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(data16$Happiness.Score, data16$Health..Life.Expectancy.)
+```{r, message=FALSE}
+
+happiness %>%
+   filter(Overall.rank < 50) %>%
+   ggplot(aes(x = Healthy.life.expectancy, y = Score, color = year)) +
+   geom_jitter()+
+   geom_smooth(method = "lm", se = FALSE)+
+   ylab("Healthy life Expectancy") 
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r, message=FALSE}
+
+happiness %>%
+   filter(Overall.rank < 60 & (year == "2015" | year == "2019")) %>%
+   ggplot(aes(x =  Freedom.to.make.life.choices, y = Score, color = year)) +
+   geom_jitter()+
+   geom_smooth(method = "lm")
+```
+
+```{r, message=FALSE}
+
+p <- happiness %>%
+   filter(Overall.rank < 50) %>%
+   ggplot(aes(x = Healthy.life.expectancy, y = Score, color = "red")) +
+   geom_jitter()
+
+anim <- p + transition_states(year,
+                    transition_length = 2,
+                    state_length = 1)+
+   labs(title = 'Year: {closest_state}', x = 'Life expectancy', y = 'Happiness Score')
+anim
+```
+
