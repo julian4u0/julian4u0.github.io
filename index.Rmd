@@ -8,12 +8,18 @@ output:
          after_body: footer.html
 ---
 
-My site is under construction :)
 
 ### About me
+
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 <hr />
-### My Projects
+### Notebooks
+
+* Lorem ipsum dolor sit amet.
+* Consectetur adipiscing elit.
+* Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+### Projects
 
 * Lorem ipsum dolor sit amet.
 * Consectetur adipiscing elit.

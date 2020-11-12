@@ -16,13 +16,18 @@ library(png)
 ```
 
 
-This is an descriptive analysis to world happiness scores
+## This is an exploratory analysis to world happiness scores
+<br><br><br><br>
 
-See info and data source 
+#### See info and data source 
+
 <https://www.kaggle.com/unsdsn/world-happiness>
 
+<br><br>
+First i begin cleaning and transforming my data
 
-```{r, include=FALSE }
+
+```{r}
 data15 <- read.csv(file = '2015.csv')
 data15$year = "2015"
 data16 <- read.csv(file = '2016.csv')
@@ -44,14 +49,7 @@ data17 <- data17 %>% select(!Whisker.high & !Whisker.low & !Dystopia.Residual & 
 data18 <- data18 %>% select(!Social.support)
 
 data19 <- data19 %>% select(!Social.support)
-```
 
-
-
-
-
-
-```{r, include=FALSE, message=FALSE}
 
 data15 <- rename(data15,
                  c('Country.or.region'='Country'), 
@@ -85,14 +83,25 @@ happiness <- rbind(data15, data16, data17, data18, data19)
 rm(data15, data16, data17, data18, data19)
 ```
 
-```{r, message=FALSE}
+```{r,include=FALSE, message=FALSE}
 happiness$Perceptions.of.corruption <- as.numeric(as.character(happiness$Perceptions.of.corruption) )
 ```
+
+<br><br>
+Here we can see the range of each variable, the higher the number, the higher the indicator
+
+
+```{r}
+summary(happiness)
+```
+
+<br><br>
+Violin plot gives us the impression that since 2017 the 30 countries with the highest happiness index are becoming healthier
 
 
 ```{r, message=FALSE}
 happiness %>%
-   filter(Overall.rank < 50) %>%
+   filter(Overall.rank < 30) %>%
    ggplot(aes(x =year, y = Healthy.life.expectancy, color = year)) +
    geom_violin()+
    geom_jitter() +
@@ -100,9 +109,8 @@ happiness %>%
 ```
 
 
-## Including Plots
+Looks like people are becoming healthier but happiness scores remain at the same levels with the top 50 countries in the index
 
-You can also embed plots, for example:
 
 ```{r, message=FALSE}
 
@@ -111,17 +119,28 @@ happiness %>%
    ggplot(aes(x = Healthy.life.expectancy, y = Score, color = year)) +
    geom_jitter()+
    geom_smooth(method = "lm", se = FALSE)+
-   ylab("Healthy life Expectancy") 
+   ylab("Happiness Score") +
+   xlab("Healthy Life Expectancy") 
 ```
+
+<br><br>
+With low confidence we can say that the top 50 countries in the happiness index are happier but not free
+
 
 ```{r, message=FALSE}
 
 happiness %>%
-   filter(Overall.rank < 60 & (year == "2015" | year == "2019")) %>%
+   filter(Overall.rank < 50 & (year == "2015" | year == "2019")) %>%
    ggplot(aes(x =  Freedom.to.make.life.choices, y = Score, color = year)) +
    geom_jitter()+
-   geom_smooth(method = "lm")
+   geom_smooth(method = "lm")+
+   ylab("Happiness Score") +
+   xlab("Freedom to make life choices") 
 ```
+
+<br><br>
+And here's an animated graph for each year!
+
 
 ```{r, message=FALSE}
 
